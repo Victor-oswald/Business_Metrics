@@ -1,0 +1,69 @@
+2025-01-05 11:47:11,178 - __main__ - INFO - Initializing business data processor and predictor...
+2025-01-05 11:47:11,202 - __main__ - INFO - Initialization successful
+2025-01-05 11:47:11,204 - __main__ - INFO - Starting Flask application
+2025-01-05 11:47:12,076 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.123:5000
+2025-01-05 11:47:12,076 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-01-05 11:47:25,359 - werkzeug - INFO - 127.0.0.1 - - [05/Jan/2025 11:47:25] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-01-05 11:47:25,623 - __main__ - INFO - Received prediction request
+2025-01-05 11:47:25,624 - __main__ - DEBUG - Received data: {'revenue': 1000000, 'growth_rate': 15, 'monthly_expenses': 200000, 'customer_acquisition_cost': 2000, 'customer_lifetime_value': 20000, 'market_size': 10000, 'num_months': 12, 'confidence_threshold': 0.7}
+2025-01-05 11:47:25,624 - __main__ - DEBUG - Creating DataFrame from request data
+2025-01-05 11:47:25,626 - __main__ - DEBUG - DataFrame created successfully
+2025-01-05 11:47:25,626 - __main__ - DEBUG - Using parameters: num_months=12, confidence_threshold=0.7
+2025-01-05 11:47:25,627 - __main__ - INFO - Generating predictions
+2025-01-05 11:47:25,632 - __main__ - ERROR - Prediction error: list index out of range
+2025-01-05 11:47:25,691 - __main__ - ERROR - Traceback (most recent call last):
+  File "c:\Users\Core i5\Desktop\model\BusinessMetrics.py", line 152, in predict
+    predictions, confidence_metrics = predictor.predict_monthly_metrics(
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Core i5\Desktop\model\Test.py", line 269, in predict_monthly_metrics
+    features, _, _, _, _, _, month_nums, quarter_nums = self.processor.process_data(current_data)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Core i5\Desktop\model\Train.py", line 322, in process_data
+    df['Net_Profit'] = df['P&L_Statement'].apply(lambda x: float(x.split('Net Profit: ')[1]))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Core i5\AppData\Roaming\Python\Python312\site-packages\pandas\core\series.py", line 4924, in apply
+    ).apply()
+      ^^^^^^^
+  File "C:\Users\Core i5\AppData\Roaming\Python\Python312\site-packages\pandas\core\apply.py", line 1427, in apply
+    return self.apply_standard()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Core i5\AppData\Roaming\Python\Python312\site-packages\pandas\core\apply.py", line 1507, in apply_standard
+    mapped = obj._map_values(
+             ^^^^^^^^^^^^^^^^
+  File "C:\Users\Core i5\AppData\Roaming\Python\Python312\site-packages\pandas\core\base.py", line 921, in _map_values
+    return algorithms.map_array(arr, mapper, na_action=na_action, convert=convert)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Core i5\AppData\Roaming\Python\Python312\site-packages\pandas\core\algorithms.py", line 1743, in map_array
+    return lib.map_infer(values, mapper, convert=convert)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "lib.pyx", line 2972, in pandas._libs.lib.map_infer
+  File "c:\Users\Core i5\Desktop\model\Train.py", line 322, in <lambda>
+    df['Net_Profit'] = df['P&L_Statement'].apply(lambda x: float(x.split('Net Profit: ')[1]))
+                                                                 ~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2025-01-05 11:47:25,697 - werkzeug - INFO - 127.0.0.1 - - [05/Jan/2025 11:47:25] "[35m[1mPOST /api/predict HTTP/1.1[0m" 500 -
+2025-01-05 12:09:20,144 - __main__ - INFO - Initializing business data processor and predictor...
+2025-01-05 12:09:20,163 - __main__ - INFO - Initialization successful
+2025-01-05 12:09:20,166 - __main__ - INFO - Starting Flask application
+2025-01-05 12:09:21,092 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.123:5000
+2025-01-05 12:09:21,094 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-01-05 12:09:27,431 - werkzeug - INFO - 127.0.0.1 - - [05/Jan/2025 12:09:27] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-01-05 12:09:27,696 - __main__ - INFO - Received prediction request
+2025-01-05 12:09:27,696 - __main__ - DEBUG - Received data: {'revenue': 1000000, 'growth_rate': 15, 'monthly_expenses': 200000, 'customer_acquisition_cost': 2000, 'customer_lifetime_value': 20000, 'market_size': 10000, 'num_months': 12, 'confidence_threshold': 0.7}
+2025-01-05 12:09:27,697 - __main__ - DEBUG - Creating DataFrame from request data
+2025-01-05 12:09:27,699 - __main__ - DEBUG - DataFrame created successfully
+2025-01-05 12:09:27,699 - __main__ - DEBUG - Using parameters: num_months=12, confidence_threshold=0.7
+2025-01-05 12:09:27,700 - __main__ - INFO - Generating predictions
+2025-01-05 12:09:32,941 - __main__ - DEBUG - Predictions generated successfully
+2025-01-05 12:09:32,941 - __main__ - INFO - Processing prediction results
+2025-01-05 12:09:32,942 - __main__ - DEBUG - Processing predictions and confidence metrics
+2025-01-05 12:09:32,943 - __main__ - DEBUG - Successfully processed predictions
+2025-01-05 12:09:32,943 - __main__ - INFO - Successfully processed and returning predictions
+2025-01-05 12:09:32,944 - werkzeug - INFO - 127.0.0.1 - - [05/Jan/2025 12:09:32] "POST /api/predict HTTP/1.1" 200 -
