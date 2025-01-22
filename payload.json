@@ -1,32 +1,44 @@
 {
-    "monthly_revenue": [{
-        "month": 0,
-        "revenue":1000000,
-        "customer_turnover_rate": 23
-    },{
-        "month": 1,
-        "revenue": 1000000,
-        "customer_turnover_rate": 23
-    }],
-    "growth_rate": {
-        "value": 15,
-        "duration": 36
-    },
-    "monthly_expenses": {
-        "value": 200000,
-        "duration": 12
-    },
     "customer_acquisition_cost": {
-        "value": 2000,
-        "duration": 18
+      "duration": 12,
+      "value": 500
     },
     "customer_lifetime_value": {
-        "value": 20000,
-        "duration": 6
+      "duration": 24,
+      "value": 2000
     },
-    "market_size": 10000,
-    "potential_risks": [
-        "Economic downturns (Market & Economic Risks)", "Operational inefficiencies (Operational Risks)", "Competing restaurants in the same neighbourhood"
+    "growth_rate": {
+      "duration": 12,
+      "value": 0.1
+    },
+    "market_size": 10000000,
+    "monthly_expenses": {
+      "duration": 12,
+      "value": 800000
+    },
+    "monthly_revenue": [
+      {
+        "customer_turnover_rate": 15,
+        "revenue": 1000000
+      },
+      {
+        "customer_turnover_rate": 14,
+        "revenue": 1100000
+      },
+      {
+        "customer_turnover_rate": 13,
+        "revenue": 1200000
+      }
     ],
-    "potential_mitigants": ["Diversifying revenue streams (Revenue Growth)"]
-}
+    "potential_mitigants": [
+      "Diversifying revenue streams (revenue growth)",
+      "Implementing automated systems (operational)",
+      "Building customer loyalty program (customer)"
+    ],
+    "potential_risks": [
+      "Economic downturns (Market & Economic Risks)",
+      "Operational inefficiencies (Operational Risks)",
+      "Supply chain disruptions (Supply Risks)"
+    ]
+  }
+  

@@ -102,40 +102,30 @@ class BusinessDataProcessor:
             'features': features
         }
 
-def normalize_predictions(results: Dict) -> Dict:
-    risk_probs = F.softmax(results['risk_analysis'], dim=1).squeeze().tolist()
-    kpi_metrics = torch.sigmoid(results['kpi_metrics']).squeeze().tolist()
-    growth_preds = results['growth_predictions']
-    base_revenue = 1000000
-    
-    growth_rates = torch.clamp(
-        F.tanh(growth_preds['relative']) * 0.15 + 0.05,
-        min=-0.10,
-        max=0.20
-    ).squeeze().tolist()
-    
-    monthly_revenues = []
-    current_revenue = base_revenue
-    for rate in growth_rates:
-        current_revenue *= (1 + rate)
-        monthly_revenues.append(current_revenue)
-    
-    return {
-        'risk_probs': risk_probs,
-        'kpi_metrics': kpi_metrics,
-        'monthly_revenues': monthly_revenues,
-        'growth_rates': growth_rates
-    }
+    def normalize_kpi_metrics(metrics):
+        # Apply different normalization for different metrics
+        normalized = []
+        for i, metric in enumerate(metrics):
+            if i == 1:  # Customer retention
+                # Scale to realistic retention range (50-95%)
+                normalized.append(50 + torch.sigmoid(metric).item() * 45)
+            elif i == 2:  # Profit margin
+                # Scale to realistic margin range (5-60%)
+                normalized.append(5 + torch.sigmoid(metric).item() * 55)
+            else:
+                # Other metrics can use original scaling if appropriate
+                normalized.append((torch.tanh(metric).item() + 1) * 0.5 * 100)
+        return normalized
+
+    # kpi_metrics = normalize_kpi_metrics(results['kpi_metrics'].squeeze())
 
 def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Dict:
-    """Generate dynamic business insights based on input data and model predictions"""
     risk_probs = normalized_results['risk_probs']
     kpi_metrics = normalized_results['kpi_metrics']
     monthly_revenues = normalized_results['monthly_revenues']
     growth_rates = normalized_results['growth_rates']
     
     def analyze_risks():
-        risk_analysis = []
         risk_categories = {
             "economic": ["recession", "downturn", "inflation", "market"],
             "operational": ["efficiency", "process", "operational", "staff", "training"],
@@ -144,12 +134,15 @@ def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Di
             "customer": ["customer", "retention", "attrition", "churn"]
         }
         
-        for risk in input_data['potential_risks']:
+        risk_analysis = []
+        for i, risk in enumerate(input_data['potential_risks']):
             risk_lower = risk.lower()
             risk_type = next((category for category, keywords in risk_categories.items() 
                             if any(keyword in risk_lower for keyword in keywords)), "general")
             
-            likelihood = "High" if risk_probs[0] > 0.6 else "Medium" if risk_probs[0] > 0.3 else "Low"
+            risk_prob = risk_probs[i % len(risk_probs)]
+            likelihood = "High" if risk_prob > 0.6 else "Medium" if risk_prob > 0.3 else "Low"
+            impact = "High" if risk_prob > 0.7 else "Moderate" if risk_prob > 0.4 else "Low"
             
             recommendations = {
                 "economic": [
@@ -179,16 +172,22 @@ def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Di
                 ],
                 "general": [
                     "Develop comprehensive risk management plan",
-                    "Implement monitoring and early warning systems",
+                    "Implement monitoring systems",
                     "Create contingency plans"
                 ]
             }
             
+            recommendation = random.choices(
+                recommendations.get(risk_type, recommendations["general"]),
+                weights=[risk_prob, 1-risk_prob, (1-risk_prob)/2],
+                k=1
+            )[0]
+            
             risk_analysis.append({
                 "risk": risk,
                 "likelihood": likelihood,
-                "impact": "High" if risk_probs[1] > 0.5 else "Moderate",
-                "recommendation": random.choice(recommendations.get(risk_type, recommendations["general"]))
+                "impact": impact,
+                "recommendation": recommendation
             })
             
         return risk_analysis
@@ -204,7 +203,7 @@ def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Di
                 "category": "Market Expansion",
                 "initiatives": [
                     f"Target {((0.3 - market_penetration) * 100):.1f}% market share increase",
-                    f"Estimated revenue potential: ${(monthly_revenues[0] * 0.3):.0f}/month",
+                    f"Estimated revenue potential: ₦{(monthly_revenues[0] * 0.3):.0f}/month",
                     "Develop targeted marketing campaigns",
                     "Expand geographical presence"
                 ]
@@ -227,7 +226,7 @@ def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Di
                 "initiatives": [
                     "Develop premium offerings",
                     "Implement cross-selling programs",
-                    f"Target customer lifetime value: ${customer_value * 1.5:.0f}",
+                    f"Target customer lifetime value: ₦{customer_value * 1.5:.0f}",
                     "Create customer loyalty program"
                 ]
             })
@@ -236,23 +235,26 @@ def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Di
 
     def generate_mitigation_strategies():
         strategies = []
+        actual_margin = kpi_metrics[2]
         
-        if kpi_metrics[2] < 0.2:
+        if actual_margin < 50:
             strategies.append({
                 "strategy": "Cost Optimization",
-                "description": f"Target {(kpi_metrics[2] * 100 + 5):.1f}% margin through operational efficiency"
+                "description": f"Target {min(actual_margin + 15, 70):.1f}% margin through operational efficiency"
             })
             
-        if input_data['monthly_revenue'][0]['customer_turnover_rate'] > 15:
+        actual_churn = input_data['monthly_revenue'][0]['customer_turnover_rate']
+        if actual_churn > 0:
+            target_reduction = min(actual_churn * 0.3, 15)
             strategies.append({
                 "strategy": "Customer Retention",
-                "description": f"Reduce churn by {(input_data['monthly_revenue'][0]['customer_turnover_rate'] - 10):.1f}% through targeted programs"
+                "description": f"Reduce churn by {target_reduction:.1f}% through targeted programs"
             })
             
         for mitigant in input_data['potential_mitigants']:
             strategies.append({
                 "strategy": mitigant.split(" (")[0],
-                "description": f"Implement {mitigant.lower()} with measurable KPIs"
+                "description": f"Implement {mitigant.lower()} with projected impact of {random.randint(10, 30)}%"
             })
             
         return strategies
@@ -260,10 +262,10 @@ def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Di
     return {
         "growth_predictions": {
             "projected_growth": f"{(sum(growth_rates) / len(growth_rates) * 100):.1f}%",
-            "revenue_range": f"${min(monthly_revenues)/1000000:.1f}M - ${max(monthly_revenues)/1000000:.1f}M",
+            "revenue_range": f"₦{min(monthly_revenues)/1000000:.1f}M - ₦{max(monthly_revenues)/1000000:.1f}M",
             "customer_metrics": {
                 "daily_churn": input_data['monthly_revenue'][0]['customer_turnover_rate'],
-                "improvement_target": f"{int(input_data['monthly_revenue'][0]['customer_turnover_rate'] * 0.7)}-{int(input_data['monthly_revenue'][0]['customer_turnover_rate'] * 0.85)} customers with optimized retention"
+                "improvement_target": f"{max(5, int(input_data['monthly_revenue'][0]['customer_turnover_rate'] * 0.6))}-{int(input_data['monthly_revenue'][0]['customer_turnover_rate'] * 0.8)} customers with optimized retention"
             }
         },
         "risk_analysis": analyze_risks(),
@@ -271,16 +273,157 @@ def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Di
         "mitigation_strategies": generate_mitigation_strategies(),
         "kpi_metrics": {
             "revenue": {
-                "current": f"${monthly_revenues[0]/1000000:.1f}M",
-                "projected": f"${monthly_revenues[-1]/1000000:.1f}M"
+                "current": f"₦{monthly_revenues[0]/1000000:.1f}M",
+                "projected": f"₦{monthly_revenues[-1]/1000000:.1f}M"
             },
             "customer_retention": {
-                "current": f"{kpi_metrics[1] * 100:.1f}%",
-                "target": f"{min(85, kpi_metrics[1] * 100 + 10):.1f}% within 6 months"
+                "current": f"{kpi_metrics[1]:.1f}%",
+                "target": f"{min(95, kpi_metrics[1] + random.uniform(5, 15)):.1f}% within 6 months"
             },
             "profit_margin": {
-                "current": f"{kpi_metrics[2] * 100:.1f}%",
-                "target": f"{min(35, kpi_metrics[2] * 100 + 15):.1f}% through efficiency improvements"
+                "current": f"{kpi_metrics[2]:.1f}%",
+                "target": f"{min(70, kpi_metrics[2] + random.uniform(10, 20)):.1f}% through efficiency improvements"
             }
         }
     }
+
+def load_trained_model(model_path: str, device: str = 'cpu') -> BusinessModel:
+    """
+    Load a trained BusinessModel from a checkpoint file.
+    
+    Args:
+        model_path: Path to the checkpoint file
+        device: Device to load the model on ('cpu' or 'cuda')
+        
+    Returns:
+        Loaded BusinessModel instance
+    """
+    # Load the checkpoint
+    checkpoint = torch.load(model_path, map_location=device)
+    
+    # Initialize the model
+    model = BusinessModel()
+    
+    # Load just the model state dict from the checkpoint
+    model.load_state_dict(checkpoint['model_state_dict'])
+    model.eval()  # Set to evaluation mode
+    return model.to(device)
+
+
+def normalize_predictions(results: Dict) -> Dict:
+    """
+    Normalize the raw model outputs into meaningful business metrics.
+    
+    Args:
+        results: Dictionary containing raw model outputs
+        
+    Returns:
+        Dictionary containing normalized predictions
+    """
+    # Normalize risk analysis probabilities
+    risk_probs = F.softmax(results['risk_analysis'], dim=1).squeeze().tolist()
+    
+    # Normalize KPI metrics with more realistic ranges
+    raw_kpi_metrics = results['kpi_metrics'].squeeze().tolist()
+    kpi_metrics = []
+    
+    for i, metric in enumerate(raw_kpi_metrics):
+        if i == 1:  # Customer retention
+            # Scale to more realistic retention range (65-85%)
+            normalized_value = 65 + torch.sigmoid(torch.tensor(metric)).item() * 20
+        elif i == 2:  # Profit margin
+            # Scale to more realistic margin range (8-35%)
+            normalized_value = 8 + torch.sigmoid(torch.tensor(metric)).item() * 27
+        else:
+            # Other metrics use standard normalization
+            normalized_value = (torch.tanh(torch.tensor(metric)).item() + 1) * 0.5 * 100
+        kpi_metrics.append(normalized_value)
+    
+    # Rest of the normalization code remains the same
+    growth_preds = results['growth_predictions']
+    base_revenue = 1000000  # Starting revenue
+    
+    growth_rates = torch.clamp(
+        F.tanh(growth_preds['relative']) * 0.25,
+        min=-0.15,
+        max=0.25
+    ).squeeze().tolist()
+    
+    monthly_revenues = []
+    current_revenue = base_revenue
+    for rate in growth_rates:
+        current_revenue *= (1 + rate)
+        monthly_revenues.append(current_revenue)
+    
+    return {
+        'risk_probs': risk_probs,
+        'kpi_metrics': kpi_metrics,
+        'monthly_revenues': monthly_revenues,
+        'growth_rates': growth_rates
+    }
+class BusinessPredictor:
+    def __init__(self, model_path: str, device: str = 'cpu'):
+        """
+        Initialize the predictor with a trained model.
+        
+        Args:
+            model_path: Path to the checkpoint file
+            device: Device to run inference on ('cpu' or 'cuda')
+        """
+        self.device = device
+        self.model = load_trained_model(model_path, device)
+        self.processor = BusinessDataProcessor()
+    
+    @torch.no_grad()
+    def predict(self, data: BusinessMetrics) -> Dict:
+        """
+        Make predictions using the trained model.
+        """
+        processed_data = self.processor.process_input(data)
+        
+        temporal_data = processed_data['temporal_data'].to(self.device)
+        features = processed_data['features'].to(self.device)
+        
+        model_output = self.model(temporal_data, features)
+        normalized_results = normalize_predictions(model_output)
+        
+        return generate_business_insights(normalized_results, data.__dict__)
+
+def main():
+    # Sample data
+    sample_data = BusinessMetrics(
+        monthly_revenue=[
+            {"revenue": 1000000, "customer_turnover_rate": 15},
+            {"revenue": 1100000, "customer_turnover_rate": 14},
+            {"revenue": 1200000, "customer_turnover_rate": 13}
+        ],
+        growth_rate={"value": 0.1, "duration": 12},
+        monthly_expenses={"value": 800000, "duration": 12},
+        customer_acquisition_cost={"value": 500, "duration": 12},
+        customer_lifetime_value={"value": 2000, "duration": 24},
+        market_size=10000000,
+        potential_risks=[
+            "Economic downturns (Market & Economic Risks)",
+            "Operational inefficiencies (Operational Risks)",
+            "Supply chain disruptions (Supply Risks)"
+        ],
+        potential_mitigants=[
+            "Diversifying revenue streams (revenue growth)",
+            "Implementing automated systems (operational)",
+            "Building customer loyalty program (customer)"
+        ]
+    )
+    
+    # Initialize predictor with trained model
+    predictor = BusinessPredictor(
+        model_path='checkpoints/model.pt',
+        device='cuda' if torch.cuda.is_available() else 'cpu'
+    )
+    
+    # Generate predictions and insights
+    insights = predictor.predict(sample_data)
+    return insights
+
+if __name__ == "__main__":
+    insights = main()
+    print(insights)
