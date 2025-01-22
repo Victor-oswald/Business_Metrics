@@ -1,8 +1,8 @@
-Business Analytics Dashboard
+# Business Analytics Dashboard
 
 A comprehensive business analytics platform that combines machine learning predictions with interactive data visualization. The system consists of a Flask-based API backend and a vanilla JavaScript frontend dashboard.
 
-Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [Features](#features)
@@ -15,19 +15,19 @@ Table of Contents
 - [Contributing](#contributing)
 - [Troubleshooting](#troubleshooting)
 
-Overview
+## Overview
 
 The Business Analytics Dashboard is a full-stack application designed to provide business insights through machine learning predictions. It analyzes various business metrics including revenue, customer retention, growth rates, and potential risks to provide actionable insights and recommendations.
 
-Key Components:
+### Key Components:
 - Machine Learning Model for business predictions
 - RESTful API built with Flask
 - Interactive dashboard built with vanilla JavaScript
 - Data visualization using Chart.js
 
-Features
+## Features
 
-Backend Features
+### Backend Features
 - Business metrics analysis
 - Risk assessment and recommendations
 - Growth predictions
@@ -35,7 +35,7 @@ Backend Features
 - Custom model architecture using PyTorch
 - RESTful API endpoints
 
-Frontend Features
+### Frontend Features
 - Real-time data visualization
 - Interactive metrics dashboard
 - Risk analysis cards
@@ -44,19 +44,19 @@ Frontend Features
 - Error handling and loading states
 
 
-Installation
+## Installation
 
- Prerequisites
+### Prerequisites
 - Python 3.8+
 - PyTorch
 - Flask
--flask-cors
+- flask-cors
 - Web browser with JavaScript enabled
 
- Backend Setup
+### Backend Setup
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/Business_Metrics.git
+git clone https://github.com/victor_oswald/Business_Metrics.git
 cd Business_Metrics
 ```
 
@@ -77,12 +77,12 @@ mkdir checkpoints
 cp path/to/your/model.pt checkpoints/
 ```
 
-Frontend Setup
+### Frontend Setup
 No additional setup required - just serve the HTML file using any web server.
 
-Usage
+## Usage
 
-Starting the Backend
+### Starting the Backend
 1. Navigate to the backend directory:
 ```bash
 cd backend
@@ -95,7 +95,7 @@ python app.py
 
 The API will be available at `http://localhost:5000`
 
-Starting the Frontend
+### Starting the Frontend
 1. Serve the frontend using a simple HTTP server:
 ```bash
 python -m http.server 8000
@@ -108,11 +108,11 @@ http://localhost:8000
 
 3. Click the "Analyze Business" button to fetch and display insights
 
-API Documentation
+## API Documentation
 
-Endpoints
+### Endpoints
 
-GET /health
+#### GET /health
 Health check endpoint
 
 Response:
@@ -122,12 +122,12 @@ Response:
 }
 ```
 
-GET /api/sample
+#### GET /api/sample
 Returns sample business metrics data
 
 Response: Sample business metrics object
 
-POST /api/predict
+#### POST /api/predict
 Generates business insights from provided metrics
 
 Request Body:
@@ -146,50 +146,50 @@ Request Body:
 
 Response: Business insights object
 
-Frontend Documentation
+## Frontend Documentation
 
-Components
+### Components
 
-Metric Cards
+#### Metric Cards
 Display key business metrics with icons and values
 
-Revenue Chart
+#### Revenue Chart
 Interactive line chart showing current and projected revenue
 
-Risk Analysis Cards
+#### Risk Analysis Cards
 Display risk assessments with likelihood and impact indicators
 
-JavaScript Functions
+### JavaScript Functions
 
-`analyzeBusiness()`
+#### `analyzeBusiness()`
 Main function to fetch and process business insights
 
-`updateDashboard(insights)`
+#### `updateDashboard(insights)`
 Updates all dashboard components with new data
 
-`updateRevenueChart(revenueData)`
+#### `updateRevenueChart(revenueData)`
 Updates the revenue projection chart
 
-Model Documentation
+## Model Documentation
 
-Model Architecture
+### Model Architecture
 - LSTM layers for temporal data processing
 - Feature network for static data processing
 - Multiple output heads for different prediction tasks
 
-Input Features
+### Input Features
 - Monthly revenue data
 - Customer turnover rates
 - Growth metrics
 - Expense data
 - Market indicators
 
-Output Predictions
+### Output Predictions
 - Risk analysis
 - KPI metrics
 - Growth predictions
 
-Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -197,32 +197,32 @@ Contributing
 4. Push to the branch
 5. Create a Pull Request
 
-Troubleshooting
+## Troubleshooting
 
-Common Issues
+### Common Issues
 
-API Connection Error
+#### API Connection Error
 - Ensure Flask server is running
 - Check CORS settings
 - Verify port availability
 
-Model Loading Error
+#### Model Loading Error
 - Verify model checkpoint exists
 - Check PyTorch version compatibility
 - Ensure sufficient memory
 
-Visualization Issues
+#### Visualization Issues
 - Clear browser cache
 - Check browser console for errors
 - Verify Chart.js loading
 
-Support
+### Support
 For additional support:
 - Open an issue on GitHub
 - Contact the development team
 - Check the documentation
 
- License
+## License
 [MIT License](LICENSE)
 
 Built with ❤️ by Victor Oswald
