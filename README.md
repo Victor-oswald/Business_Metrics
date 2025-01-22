@@ -1,4 +1,4 @@
-# Business Analytics Dashboard
+# Business Metrics
 
 A comprehensive business analytics platform that combines machine learning predictions with interactive data visualization. The system consists of a Flask-based API backend and a vanilla JavaScript frontend dashboard.
 
