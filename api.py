@@ -48,6 +48,7 @@ def predict():
 
         # Get JSON data from request
         data = request.get_json()
+        print(data)
         
         # Validate required fields
         required_fields = [
@@ -92,9 +93,9 @@ def get_sample_data():
     """Return sample data structure for testing"""
     sample_data = {
         "monthly_revenue": [
-            {"revenue": 1000000, "customer_turnover_rate": 15},
+            {"revenue": 1000000, "customer_turnover_rate": 1},
             {"revenue": 1100000, "customer_turnover_rate": 14},
-            {"revenue": 1200000, "customer_turnover_rate": 13}
+            {"revenue": 1200000, "customer_turnover_rate": 4}
         ],
         "growth_rate": {"value": 0.1, "duration": 12},
         "monthly_expenses": {"value": 800000, "duration": 12},

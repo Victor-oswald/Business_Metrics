@@ -177,11 +177,7 @@ def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Di
                 ]
             }
             
-            recommendation = random.choices(
-                recommendations.get(risk_type, recommendations["general"]),
-                weights=[risk_prob, 1-risk_prob, (1-risk_prob)/2],
-                k=1
-            )[0]
+            recommendation = random.choice(recommendations.get(risk_type, recommendations["general"]))
             
             risk_analysis.append({
                 "risk": risk,
@@ -194,7 +190,7 @@ def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Di
 
     def generate_opportunities():
         opportunities = []
-        avg_monthly_growth = (monthly_revenues[-1] / monthly_revenues[0] - 1) / 12
+        avg_monthly_growth = (monthly_revenues[-1] / monthly_revenues[0] - 1) / len(monthly_revenues)
         market_penetration = monthly_revenues[0] / (input_data['market_size'] * 12)
         customer_value = input_data['customer_lifetime_value']['value']
         
@@ -259,13 +255,32 @@ def generate_business_insights(normalized_results: Dict, input_data: Dict) -> Di
             
         return strategies
 
+    def format_improvement_target(current_churn: float) -> str:
+        """
+        Format the improvement target string with proper range ordering
+        
+        Args:
+            current_churn: Current customer turnover rate
+            
+        Returns:
+            Formatted improvement target string
+        """
+        target_upper = max(5, int(current_churn * 0.6))
+        target_lower = int(current_churn * 0.8)
+        
+        # Ensure the range is properly ordered (lower-upper)
+        if target_lower > target_upper:
+            target_lower, target_upper = target_upper, target_lower
+            
+        return f"{target_lower}-{target_upper} customers with optimized retention"
+
     return {
         "growth_predictions": {
             "projected_growth": f"{(sum(growth_rates) / len(growth_rates) * 100):.1f}%",
             "revenue_range": f"₦{min(monthly_revenues)/1000000:.1f}M - ₦{max(monthly_revenues)/1000000:.1f}M",
             "customer_metrics": {
                 "daily_churn": input_data['monthly_revenue'][0]['customer_turnover_rate'],
-                "improvement_target": f"{max(5, int(input_data['monthly_revenue'][0]['customer_turnover_rate'] * 0.6))}-{int(input_data['monthly_revenue'][0]['customer_turnover_rate'] * 0.8)} customers with optimized retention"
+                "improvement_target": format_improvement_target(input_data['monthly_revenue'][0]['customer_turnover_rate'])
             }
         },
         "risk_analysis": analyze_risks(),
