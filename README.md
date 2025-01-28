@@ -1,4 +1,4 @@
-# Business Analytics Dashboard
+# Business Metrics
 
 A comprehensive business analytics platform that combines machine learning predictions with interactive data visualization. The system consists of a Flask-based API backend and a vanilla JavaScript frontend dashboard.
 
@@ -56,7 +56,7 @@ The Business Analytics Dashboard is a full-stack application designed to provide
 ### Backend Setup
 1. Clone the repository:
 ```bash
-git clone https://github.com/victor_oswald/Business_Metrics.git
+git clone https://github.com/victor-oswald/Business_Metrics.git
 cd Business_Metrics
 ```
 
